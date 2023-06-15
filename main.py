@@ -3,6 +3,8 @@ from database import SessionLocal, engine
 from sqlalchemy.orm import Session
 import schemas
 import models
+from utils import hashing
+from passlib.context import CryptContext
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI(title='Blog API')
@@ -69,14 +71,14 @@ def blog_edit(id: int, request: schemas.Blog, db: Session = Depends(get_db)):
 @app.post("/user", tags=["user"], status_code=status.HTTP_201_CREATED)
 def create_user(request: schemas.User, db: Session = Depends(get_db)):
     new_user = models.User(
-        name=request.name, email=request.email, password=request.password)
+        name=request.name, email=request.email, password=hashing.Hash.becrypt(request.password))
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
     return new_user
 
 
-@app.get("/user", tags=["user"], status_code=status.HTTP_200_OK)
-def create_user(db: Session = Depends(get_db)):
+@app.get("/user", tags=["user"], status_code=status.HTTP_200_OK, response_model=list[schemas.ShowUser])
+def get_user(db: Session = Depends(get_db)):
     all_user = db.query(models.User).all()
     return all_user
