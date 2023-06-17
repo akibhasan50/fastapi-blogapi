@@ -21,14 +21,14 @@ def get_db():
 @app.post("/blog", tags=["blog"], status_code=status.HTTP_201_CREATED)
 def create_blog(request: schemas.Blog, db: Session = Depends(get_db)):
     #  new_blog = models.Blog(**request.dist())
-    new_blog = models.Blog(title=request.title, body=request.body)
+    new_blog = models.Blog(title=request.title, body=request.body,user_id=request.user_id)
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)
     return new_blog
 
 
-@app.get("/blog", tags=["blog"])
+@app.get("/blog", tags=["blog"],response_model=schemas.ShowBlog)
 def all_blog(db: Session = Depends(get_db)):
     blogs = db.query(models.Blog).all()
     return blogs
