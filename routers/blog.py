@@ -35,3 +35,5 @@ def blog_delete(id: int, db: Session = Depends(database.get_db)):
 def blog_edit(id: int, request: schemas.Blog, db: Session = Depends(database.get_db)):
 
     return blog.edit_blog(id, request, db)
+
+ 
